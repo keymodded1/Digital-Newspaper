@@ -124,3 +124,65 @@ function showPage(n) {
     });
   }, 300);
 }
+
+// TTS sistemi (mevcut kodlar korunur, sadece geliştirme yapılır)
+let currentUtterance = null;
+let isPaused = false;
+let lastTapTime = 0;
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+
+  if (currentUtterance) {
+    window.speechSynthesis.cancel();
+    currentUtterance = null;
+  }
+
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.lang = 'en-US';
+  currentUtterance.rate = 1;
+  window.speechSynthesis.speak(currentUtterance);
+}
+
+function toggleSpeech(text) {
+  const now = new Date().getTime();
+  const tapGap = now - lastTapTime;
+  lastTapTime = now;
+
+  if (tapGap < 400) {
+    window.speechSynthesis.cancel();
+    speakText(text);
+    isPaused = false;
+  } else if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+    window.speechSynthesis.pause();
+    isPaused = true;
+  } else if (isPaused) {
+    window.speechSynthesis.resume();
+    isPaused = false;
+  } else {
+    speakText(text);
+  }
+}
+
+// TTS butonları (mevcutlara ek olarak uyumluluk garantisi için tekrar bağlanır)
+document.querySelectorAll('.tts-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const text = this.getAttribute('data-text');
+    toggleSpeech(text);
+  });
+});
+
+// Mobilde scroll yönüne göre menü gizleme/gösterme
+let lastScrollTop = 0;
+const header = document.querySelector('header');
+
+window.addEventListener('scroll', function () {
+  const st = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (st > lastScrollTop) {
+    header.classList.add('header-hidden');
+  } else {
+    header.classList.remove('header-hidden');
+  }
+  lastScrollTop = st <= 0 ? 0 : st;
+}, false);
