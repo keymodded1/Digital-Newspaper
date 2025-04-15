@@ -356,3 +356,21 @@ body::before {
   border-left: 4px solid #00f7ff;
   border-radius: 8px;
 }
+/* Mevcut stiller korunur, sadece eklemeler yapılır */
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+}
+
+.header-hidden {
+  transform: translateY(-100%);
+}
+
+body {
+  padding-top: 60px; /* Menü yüksekliği kadar boşluk bırakılır */
+}
